@@ -1,3 +1,4 @@
+<img width="1915" height="962" alt="Screenshot 2026-11-09 202247" src="https://github.com/user-attachments/assets/29d1474d-072d-4f76-85ad-36c5385d6212" />
 # 🛒 POS System – Retail & Cashier Web Application
 
 [![React](https://img.shields.io/badge/React-18.2.0-61DAFB?logo=react&logoColor=black)](https://react.dev/)
@@ -50,28 +51,31 @@ The frontend interface bridges store employees and business managers into a cohe
 
 ---
 
+
 ## 🖼️ Demo Screenshots
 
 ### 🔐 Authentication & Session Recovery
 <img width="1919" height="978" alt="Authentication" src="https://github.com/user-attachments/assets/f4b5c686-1491-4c6a-b0a1-44d6b71495d5" />
 
 ### 🛒 Cashier POS Checkout Interface
-<img width="1919" height="980" alt="POS Interface" src="https://github.com/user-attachments/assets/b7c93eb0-fc64-4717-973b-9055e4ea97f8" />
+<img width="1911" height="962" alt="Screenshot 2026-11-09 202454" src="https://github.com/user-attachments/assets/6039e014-cdc9-4099-a4fe-088be94c8c94" />
 
 ### 💳 Split / Multi-Method Payment Modal
-<img width="1919" height="980" alt="Payment Interface" src="https://github.com/user-attachments/assets/480ee0be-c750-456e-9529-a91c3ef78af6" />
+
+<img width="1912" height="964" alt="Screenshot 2026-11-09 202622" src="https://github.com/user-attachments/assets/32d1a44b-0dcb-4642-b0e0-4fa7edcddcb1" />
 
 ### 💵 End-of-Shift Cash Counting & Settlement
 <img width="1919" height="978" alt="Settlement Interface" src="https://github.com/user-attachments/assets/115bb1d8-31e1-417c-891c-95b1dc2588a1" />
 
 ### 📦 Product & Inventory Catalog Management
-<img width="1919" height="980" alt="Product Management" src="https://github.com/user-attachments/assets/9eb76726-2c32-4fdc-97d2-083ef5d8c84e" />
+<img width="1915" height="965" alt="Screenshot 2026-11-09 202332" src="https://github.com/user-attachments/assets/260c8d6a-94be-4e5b-86a0-2f528133095d" />
 
 ### 📊 Business Intelligence & Reporting Dashboard
-<img width="1896" height="978" alt="Reports Dashboard" src="https://github.com/user-attachments/assets/d2845843-ae17-49ff-8483-accb681fd418" />
+<img width="1915" height="962" alt="Screenshot 2026-11-09 202247" src="https://github.com/user-attachments/assets/09497cd7-dbcf-4718-907f-6366350bbd00" />
 
 ### 📥 Supplier Import Orders & Stock Receiving
-<img width="1919" height="978" alt="Import Product" src="https://github.com/user-attachments/assets/7b35ea8b-ee71-4f45-9cd4-0ecd838837c7" />
+<img width="1915" height="962" alt="Screenshot 2026-11-09 203659" src="https://github.com/user-attachments/assets/2fd4d105-384f-4f30-be3a-bb3fb2514822" />
+
 
 ---
 
