@@ -30,14 +30,12 @@ export const fetchProducts = createAsyncThunk(
 );
 
 // Create product
-
 export const createProduct = createAsyncThunk(
   "product/create",
   async ({ product, image }, { rejectWithValue }) => {
     try {
       const formData = new FormData();
-
-          formData.append("product", JSON.stringify(product));
+      formData.append("product", JSON.stringify(product));
 
       if (image) {
         formData.append("images", image);
@@ -50,6 +48,25 @@ export const createProduct = createAsyncThunk(
   }
 );
 
+// Update product
+export const updateProduct = createAsyncThunk(
+  "product/update",
+  async ({ id, product, image }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append("product", JSON.stringify(product));
+
+      if (image) {
+        formData.append("images", image);
+      }
+
+      const res = await productAPI.updateProduct(id, formData);
+      return res.result || res;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Update failed");
+    }
+  }
+);
 
 // Delete product
 export const deleteProduct = createAsyncThunk(
@@ -114,7 +131,6 @@ export const searchProductByCode = createAsyncThunk(
       return rejectWithValue(e.response?.data || e.message);
     }
   }
-
 );
 
 export const fetchProductsBySupplier = createAsyncThunk(

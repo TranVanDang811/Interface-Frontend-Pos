@@ -1,12 +1,24 @@
 import {
   HomeIcon,
-  UserCircleIcon,
-  TableCellsIcon,
-  InformationCircleIcon,
+  ArchiveBoxIcon,
+  CubeIcon,
+  TagIcon,
+  ArrowDownTrayIcon,
+  UserGroupIcon,
+  IdentificationIcon,
+  UserIcon,
+  BanknotesIcon,
+  CreditCardIcon,
+  ClipboardDocumentListIcon,
+  ChartBarIcon,
+  ShieldCheckIcon,
+  TicketIcon,
+  Squares2X2Icon,
+  BuildingStorefrontIcon,
   ServerStackIcon,
   RectangleStackIcon,
 } from "@heroicons/react/24/solid";
-import { Home} from "@/pages/dashboard";
+import { Home } from "@/pages/dashboard";
 import { SignIn, SignUp } from "@/pages/auth";
 import Products from "./pages/dashboard/products";
 import AddProduct from "./pages/product/AddProduct";
@@ -20,9 +32,14 @@ import Discounts from "./pages/dashboard/discounts";
 import POS from "./layouts/pos";
 import ChangePassword from "./pages/auth/ChangePassword";
 import Orders from "./pages/dashboard/orders";
+import ProductsHistory from "./pages/dashboard/ProductsHistory";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
+};
+
+const subIcon = {
+  className: "w-4 h-4 text-inherit",
 };
 
 export const routes = [
@@ -31,95 +48,116 @@ export const routes = [
     pages: [
       {
         icon: <HomeIcon {...icon} />,
-        name: "dashboard",
+        name: "Dashboard",
         path: "/home",
         element: <Home />,
       },
 
-      // ===== NHÓM NGƯỜI DÙNG =====
+      // ===== HÀNG HÓA & KHO =====
       {
-        icon: <ServerStackIcon {...icon} />,
+        icon: <ArchiveBoxIcon {...icon} />,
         name: "Commodity",
+        badge: "Kho hàng",
         collapse: [
-            {
-            name: "products",
+          {
+            icon: <TagIcon {...subIcon} />,
+            name: "Products",
             path: "/products",
             element: <Products />,
           },
           {
-            name: "importOrder",
+            icon: <ArrowDownTrayIcon {...subIcon} />,
+            name: "Import Orders",
             path: "/import-orders",
             element: <ImportOrders />,
           },
-        
         ],
       },
 
-  
+      // ===== NGƯỜI DÙNG =====
       {
-        icon: <UserCircleIcon {...icon} />, 
-        name: "USERs",
+        icon: <UserGroupIcon {...icon} />,
+        name: "Users",
+        badge: "Nhân sự",
         collapse: [
-           {
+          {
+            icon: <IdentificationIcon {...subIcon} />,
             name: "Staff",
             path: "/users",
             element: <Users />,
           },
-            {
-            name: "Customers history",
+          {
+            icon: <UserIcon {...subIcon} />,
+            name: "Customers History",
             path: "/customers-history",
             element: <Customers />,
           },
-      
         ],
       },
+
+      // ===== BÁN HÀNG =====
       {
-        icon: <UserCircleIcon {...icon} />, 
-        name: "SALES",
+        icon: <BanknotesIcon {...icon} />,
+        name: "Sales",
+        badge: "Giao dịch",
         collapse: [
-           {
+          {
+            icon: <CreditCardIcon {...subIcon} />,
             name: "Sales History",
             path: "/sales-history",
             element: <Payments />,
-          },  {
+          },
+          {
+            icon: <ClipboardDocumentListIcon {...subIcon} />,
             name: "Orders History",
             path: "/orders-history",
             element: <Orders />,
           },
-           
+          {
+            icon: <ChartBarIcon {...subIcon} />,
+            name: "Products Sales",
+            path: "/products-history",
+            element: <ProductsHistory />,
+          },
         ],
       },
+
+      // ===== QUẢN TRỊ =====
       {
-        icon: <UserCircleIcon {...icon} />, 
-        name: "ADMIN",
-          roles: ["ADMIN"], 
+        icon: <ShieldCheckIcon {...icon} />,
+        name: "Admin",
+        roles: ["ADMIN"],
+        badge: "Quản trị",
         collapse: [
           {
-            name: "Discount",
+            icon: <TicketIcon {...subIcon} />,
+            name: "Discounts",
             path: "/discounts",
             element: <Discounts />,
+            roles: ["ADMIN"],
           },
-           {
-            name: "Category",
+          {
+            icon: <Squares2X2Icon {...subIcon} />,
+            name: "Categories",
             path: "/categories",
             element: <Categorys />,
+            roles: ["ADMIN"],
           },
-             {
-            name: "Supplier",
+          {
+            icon: <BuildingStorefrontIcon {...subIcon} />,
+            name: "Suppliers",
             path: "/suppliers",
             element: <Suppliers />,
+            roles: ["ADMIN"],
           },
-             
         ],
       },
     ],
   },
 
   {
-    // title: "auth pages",
-   
     layout: "auth",
-     hidden: true,
+    hidden: true,
     pages: [
       {
         icon: <ServerStackIcon {...icon} />,

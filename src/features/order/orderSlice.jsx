@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchOrders,
+  fetchOrderSummary,
   createOrder,
   deleteOrder,
   fetchOrderById,
@@ -8,15 +9,17 @@ import {
   fetchRevenueStats,
   holdOrder,
   updateOrder,
-  fetchOrdersByStatus
+  fetchOrdersByStatus,
 } from "./orderThunks";
 
 const initialState = {
   list: [],
   orderDetail: null,
   revenueStats: null,
+  summary: null,
   page: 0,
   totalPages: 0,
+  totalElements: 0,
   loading: false,
   error: null,
 };
@@ -27,7 +30,6 @@ const orderSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-
       // Fetch orders
       .addCase(fetchOrders.pending, (s) => {
         s.loading = true;
@@ -39,10 +41,16 @@ const orderSlice = createSlice({
         s.list = payload.content || payload;
         s.page = payload.number || 0;
         s.totalPages = payload.totalPages || 0;
+        s.totalElements = payload.totalElements ?? (Array.isArray(s.list) ? s.list.length : 0);
       })
       .addCase(fetchOrders.rejected, (s, a) => {
         s.loading = false;
         s.error = a.payload;
+      })
+
+      // Fetch order summary
+      .addCase(fetchOrderSummary.fulfilled, (s, a) => {
+        s.summary = a.payload;
       })
 
       // Create order
@@ -57,7 +65,7 @@ const orderSlice = createSlice({
 
       // Delete order
       .addCase(deleteOrder.fulfilled, (s, a) => {
-        s.list = s.list.filter(o => o.id !== a.payload);
+        s.list = s.list.filter((o) => o.id !== a.payload);
       })
 
       // Filter orders
@@ -69,10 +77,10 @@ const orderSlice = createSlice({
       .addCase(fetchRevenueStats.fulfilled, (s, a) => {
         s.revenueStats = a.payload;
       })
-      
+
       // HOLD order
       .addCase(holdOrder.fulfilled, (s, a) => {
-        const order = s.list.find(o => o.id === a.payload.orderId);
+        const order = s.list.find((o) => o.id === a.payload.orderId);
         if (order) {
           order.status = "HOLD";
         }
@@ -91,7 +99,6 @@ const orderSlice = createSlice({
         s.page = payload.number || 0;
         s.totalPages = payload.totalPages || 0;
       });
-      ;
   },
 });
 

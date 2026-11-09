@@ -51,3 +51,14 @@ export const fetchShiftReport = createAsyncThunk(
     }
   }
 );
+
+export const exportShiftReport = createAsyncThunk(
+  "shift/export",
+  async (shiftCode, { rejectWithValue }) => {
+    try {
+      return await shiftAPI.exportShiftReport(shiftCode);
+    } catch (e) {
+      return rejectWithValue(e.response?.data || e.message);
+    }
+  }
+);

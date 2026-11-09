@@ -1,13 +1,26 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import supplierAPI from "./supplierAPI";
 
-// Fetch list
+// Fetch list with search & pagination
 export const fetchSuppliers = createAsyncThunk(
   "supplier/fetchSuppliers",
-  async ({ page = 1, size = 5 } = {}, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const res = await supplierAPI.getSuppliers(page, size);
-        return res.result || res;
+      const res = await supplierAPI.getSuppliers(params);
+      return res.result || res;
+    } catch (e) {
+      return rejectWithValue(e.response?.data || e.message);
+    }
+  }
+);
+
+// Fetch summary KPIs
+export const fetchSupplierSummary = createAsyncThunk(
+  "supplier/fetchSupplierSummary",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await supplierAPI.getSummary();
+      return res.result || res;
     } catch (e) {
       return rejectWithValue(e.response?.data || e.message);
     }
@@ -17,7 +30,7 @@ export const fetchSuppliers = createAsyncThunk(
 // Search
 export const searchSuppliers = createAsyncThunk(
   "supplier/searchSuppliers",
-  async ({ keyword, page = 1, size = 5 }, { rejectWithValue }) => {
+  async ({ keyword, page = 1, size = 10 }, { rejectWithValue }) => {
     try {
       const res = await supplierAPI.searchSuppliers(keyword, page, size);
       return res.result || res;
@@ -33,7 +46,7 @@ export const createSupplier = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const res = await supplierAPI.createSupplier(payload);
-       return res.result || res;
+      return res.result || res;
     } catch (e) {
       return rejectWithValue(e.response?.data || e.message);
     }
@@ -43,9 +56,11 @@ export const createSupplier = createAsyncThunk(
 // Update
 export const updateSupplier = createAsyncThunk(
   "supplier/updateSupplier",
-  async ({ id, data }, { rejectWithValue }) => {
+  async ({ id, ...payload }, { rejectWithValue }) => {
     try {
-      const res = await supplierAPI.updateSupplier(id, data);
+      // payload may be nested under data or direct
+      const body = payload.data ? payload.data : payload;
+      const res = await supplierAPI.updateSupplier(id, body);
       return res.result || res;
     } catch (e) {
       return rejectWithValue(e.response?.data || e.message);

@@ -17,9 +17,22 @@ export const createPayment = createAsyncThunk(
 // Get payments
 export const fetchPayments = createAsyncThunk(
   "payment/fetchPayments",
-  async ({ page = 1, size = 5 } = {}, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const res = await paymentAPI.getPayments(page, size);
+      const res = await paymentAPI.getPayments(params);
+      return res.result || res;
+    } catch (e) {
+      return rejectWithValue(e.response?.data || e.message);
+    }
+  }
+);
+
+// Get payment summary stats
+export const fetchPaymentSummary = createAsyncThunk(
+  "payment/fetchPaymentSummary",
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const res = await paymentAPI.getPaymentSummary(params);
       return res.result || res;
     } catch (e) {
       return rejectWithValue(e.response?.data || e.message);
@@ -40,12 +53,11 @@ export const fetchPaymentByOrder = createAsyncThunk(
   }
 );
 
-// Refund payment
-export const refundPayment = createAsyncThunk(
-  "payment/refundPayment",
+export const refundItems = createAsyncThunk(
+  "payment/refundItems",
   async ({ paymentId, data }, { rejectWithValue }) => {
     try {
-      const res = await paymentAPI.refundPayment(paymentId, data);
+      const res = await paymentAPI.refundItems(paymentId, data);
       return res.result || res;
     } catch (e) {
       return rejectWithValue(e.response?.data || e.message);
@@ -71,7 +83,19 @@ export const exportInvoice = createAsyncThunk(
   async (paymentId, { rejectWithValue }) => {
     try {
       const res = await paymentAPI.exportInvoice(paymentId);
-      return res;
+      return res; // HTML string
+    } catch (e) {
+      return rejectWithValue(e.response?.data || e.message);
+    }
+  }
+);
+
+export const fetchOrderById = createAsyncThunk(
+  "payment/fetchOrderById",
+  async (orderId, { rejectWithValue }) => {
+    try {
+      const res = await paymentAPI.getOrderById(orderId);
+      return res.result || res;
     } catch (e) {
       return rejectWithValue(e.response?.data || e.message);
     }

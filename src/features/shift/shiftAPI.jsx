@@ -21,4 +21,9 @@ export default {
   getShiftReport: () =>
     axiosInstance.get("/shifts/report")
       .then(res => res.data),
+
+      exportShiftReport: (shiftCode) =>
+  axiosInstance.get(`/shifts/export/${shiftCode}`, {
+    responseType: "text",
+  }).then(res => res.data),
 };

@@ -18,4 +18,11 @@ export default {
   getDashboardReport: () =>
     axiosInstance.get("/reports/dashboard")
       .then(res => res.data),
+
+      // Product report
+getProductReport: (params) =>
+  axiosInstance.get("/reports/products", {
+    params,
+  }).then(res => res.data),
+  
 };

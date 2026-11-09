@@ -1,16 +1,29 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Dashboard, Auth } from "@/layouts";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import { restoreSession } from "./features/auth/authThunks";
-import POS from "./layouts/pos";
 import GlobalAlert from "./utils/GlobalAlert";
-import PaymentPage from "./pages/pos/PaymentPage";
-import PosManage from "./pages/pos/PosManage";
-import AddCustomerPos from "./pages/pos/AddCustomerPos";
-import SettlementPos from "./pages/pos/SettlementPos";
-import OpenShift from "./pages/pos/OpenShift";
+
+// Code splitting / Lazy Loading
+const Dashboard = lazy(() => import("@/layouts/dashboard"));
+const Auth = lazy(() => import("@/layouts/auth"));
+const POS = lazy(() => import("@/layouts/pos"));
+const PaymentPage = lazy(() => import("@/pages/pos/PaymentPage"));
+const PosManage = lazy(() => import("@/pages/pos/PosManage"));
+const AddCustomerPos = lazy(() => import("@/pages/pos/AddCustomerPos"));
+const SettlementPos = lazy(() => import("@/pages/pos/SettlementPos"));
+const OpenShift = lazy(() => import("@/pages/pos/OpenShift"));
+const ReprintPos = lazy(() => import("@/pages/pos/ReprintPos"));
+
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p className="text-gray-600 font-medium">Đang tải...</p>
+    </div>
+  </div>
+);
 
 function App() {
   const dispatch = useDispatch();
@@ -25,84 +38,117 @@ function App() {
 
   // Loading khi đang check session
   if (!sessionRestored || loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p>Đang tải...</p>
-        </div>
-      </div>
-    );
+    return <LoadingFallback />;
   }
 
   // Chưa đăng nhập -> chỉ cho vào /auth
   if (!isAuthenticated) {
     return (
       <>
-      <GlobalAlert />
-      <Routes>
-        <Route path="/auth/*" element={<Auth />} />
-        <Route path="*" element={<Navigate to="/auth/sign-in" replace />} />
-      </Routes>
+        <GlobalAlert />
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            <Route path="/auth/*" element={<Auth />} />
+            <Route path="*" element={<Navigate to="/auth/sign-in" replace />} />
+          </Routes>
+        </Suspense>
       </>
-        
     );
   }
 
   // Đã đăng nhập
-  const role = user?.roles?.[0]?.name;
-
+  const userRoleNames = user?.roles?.map((r) => (typeof r === "string" ? r : r.name)?.toUpperCase()) || [];
   const dashboardRoles = ["ADMIN", "MANAGE"];
+  const hasDashboardAccess = userRoleNames.some((r) => dashboardRoles.includes(r));
 
-  const defaultRoute = dashboardRoles.includes(role)
+  const defaultRoute = hasDashboardAccess
     ? "/dashboard/home"
     : "/pos";
 
   return (
     <>
-    <GlobalAlert />
-    <Routes>
+      <GlobalAlert />
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
+          {/* Redirect /auth nếu đã login */}
+          <Route path="/auth/*" element={<Auth />} />
 
-      {/* Redirect /auth nếu đã login */}
-<Route path="/auth/*" element={<Auth />} />
-      {/* ADMIN Dashboard */}
-      <Route
-        path="/dashboard/*"
-        element={
-          <RoleProtectedRoute allowedRoles={["ADMIN", "MANAGE"]}>
-            <Dashboard />
-          </RoleProtectedRoute>
-        }
-      />
+          {/* ADMIN Dashboard */}
+          <Route
+            path="/dashboard/*"
+            element={
+              <RoleProtectedRoute allowedRoles={["ADMIN", "MANAGE"]}>
+                <Dashboard />
+              </RoleProtectedRoute>
+            }
+          />
 
-      {/* POS Page */}
-      <Route
-        path="/pos"
-        element={
-          <RoleProtectedRoute allowedRoles={["ADMIN","MANAGE", "EMPLOYEE"]}>
-            <POS />
-          </RoleProtectedRoute>
-        }
-      />
-      <Route
-        path="/pos/payment"
-        element={
-          <RoleProtectedRoute allowedRoles={["ADMIN","MANAGE","EMPLOYEE"]}>
-            <PaymentPage />
-          </RoleProtectedRoute>
-        }
-      />
-      
-      <Route path="/pos/open-shift" element={<OpenShift />} />
-      <Route path="/pos/manage" element={<PosManage />} />
-      <Route path="/pos/add/customer" element={<AddCustomerPos />} />
-      <Route path="/pos/settlement" element={<SettlementPos />} />
-      {/* Root redirect */}
-      <Route path="/" element={<Navigate to={defaultRoute} replace />} />
+          {/* POS Page */}
+          <Route
+            path="/pos"
+            element={
+              <RoleProtectedRoute allowedRoles={["ADMIN", "MANAGE", "EMPLOYEE"]}>
+                <POS />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="/pos/payment"
+            element={
+              <RoleProtectedRoute allowedRoles={["ADMIN", "MANAGE", "EMPLOYEE"]}>
+                <PaymentPage />
+              </RoleProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/pos/open-shift"
+            element={
+              <RoleProtectedRoute allowedRoles={["ADMIN", "MANAGE", "EMPLOYEE"]}>
+                <OpenShift />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="/pos/manage"
+            element={
+              <RoleProtectedRoute allowedRoles={["ADMIN", "MANAGE", "EMPLOYEE"]}>
+                <PosManage />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="/pos/add/customer"
+            element={
+              <RoleProtectedRoute allowedRoles={["ADMIN", "MANAGE", "EMPLOYEE"]}>
+                <AddCustomerPos />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="/pos/settlement"
+            element={
+              <RoleProtectedRoute allowedRoles={["ADMIN", "MANAGE", "EMPLOYEE"]}>
+                <SettlementPos />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="/pos/reprint"
+            element={
+              <RoleProtectedRoute allowedRoles={["ADMIN", "MANAGE", "EMPLOYEE"]}>
+                <ReprintPos />
+              </RoleProtectedRoute>
+            }
+          />
 
-      {/* 404 redirect */}
-      <Route path="*" element={<Navigate to={defaultRoute} replace />} />
-    </Routes>
+          {/* Root redirect */}
+          <Route path="/" element={<Navigate to={defaultRoute} replace />} />
+
+          {/* 404 redirect */}
+          <Route path="*" element={<Navigate to={defaultRoute} replace />} />
+        </Routes>
+      </Suspense>
     </>
   );
 }

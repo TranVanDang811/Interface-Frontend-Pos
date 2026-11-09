@@ -1,19 +1,65 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/backend",
-  timeout: 10000,
+  baseURL: import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? "/backend" : "http://localhost:8080/backend"),
+  timeout: 15000,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 /* =========================
+   TOKEN HELPERS
+   - Lưu ưu tiên vào sessionStorage để mỗi tab có thể đăng nhập độc lập
+     (Ví dụ: Tab 1 là Employee bán hàng POS, Tab 2 là Admin/Manage xem Dashboard).
+========================= */
+export const getToken = () => {
+  // Hỗ trợ mở Dashboard song song từ tab POS
+  const handoff = localStorage.getItem("admin_handoff_token");
+  if (handoff) {
+    sessionStorage.setItem("token", handoff);
+    localStorage.removeItem("admin_handoff_token");
+    const handoffRefresh = localStorage.getItem("admin_handoff_refresh");
+    if (handoffRefresh) {
+      sessionStorage.setItem("refreshToken", handoffRefresh);
+      localStorage.removeItem("admin_handoff_refresh");
+    }
+    return handoff;
+  }
+  return sessionStorage.getItem("token") || localStorage.getItem("token");
+};
+
+export const getRefreshToken = () => sessionStorage.getItem("refreshToken") || localStorage.getItem("refreshToken");
+
+export const setTokens = ({ token, refreshToken }) => {
+  if (token) {
+    sessionStorage.setItem("token", token);
+  }
+  if (refreshToken) {
+    sessionStorage.setItem("refreshToken", refreshToken);
+  }
+  // Xóa token ở localStorage để tránh xung đột giữa các tab trên cùng trình duyệt
+  localStorage.removeItem("token");
+  localStorage.removeItem("refreshToken");
+};
+
+export const clearTokens = () => {
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("refreshToken");
+  sessionStorage.removeItem("shiftCode");
+  localStorage.removeItem("token");
+  localStorage.removeItem("refreshToken");
+  localStorage.removeItem("shiftCode");
+  localStorage.removeItem("admin_handoff_token");
+  localStorage.removeItem("admin_handoff_refresh");
+};
+
+/* =========================
    REQUEST INTERCEPTOR
 ========================= */
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,7 +71,6 @@ axiosInstance.interceptors.request.use(
 /* =========================
    REFRESH LOGIC
 ========================= */
-
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -41,6 +86,19 @@ const processQueue = (error, token = null) => {
 };
 
 /* =========================
+   AUTH ENDPOINT GUARD
+   - Không kích hoạt refresh token cho các endpoint đăng nhập/xác thực
+========================= */
+const isAuthEndpoint = (url = "") => {
+  return (
+    url.includes("/auth/token") ||
+    url.includes("/auth/refresh") ||
+    url.includes("/auth/logout") ||
+    url.includes("/auth/introspect")
+  );
+};
+
+/* =========================
    RESPONSE INTERCEPTOR
 ========================= */
 axiosInstance.interceptors.response.use(
@@ -48,8 +106,12 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !isAuthEndpoint(originalRequest.url)
+    ) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -65,14 +127,13 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refreshToken = localStorage.getItem("refreshToken");
+        const refreshToken = getRefreshToken();
         if (!refreshToken) throw new Error("No refresh token");
 
-        // ⚠ QUAN TRỌNG: phải đúng field backend yêu cầu
-        const response = await axios.post(
-          `${axiosInstance.defaults.baseURL}/auth/refresh`,
-          { token: refreshToken }
-        );
+        const baseUrl = (axiosInstance.defaults.baseURL || "").replace(/\/+$/, "");
+        const response = await axios.post(`${baseUrl}/auth/refresh`, {
+          token: refreshToken,
+        });
 
         const newToken =
           response.data.result?.token || response.data.token;
@@ -83,11 +144,7 @@ axiosInstance.interceptors.response.use(
 
         if (!newToken) throw new Error("Invalid refresh response");
 
-        localStorage.setItem("token", newToken);
-
-        if (newRefreshToken) {
-          localStorage.setItem("refreshToken", newRefreshToken);
-        }
+        setTokens({ token: newToken, refreshToken: newRefreshToken });
 
         processQueue(null, newToken);
 
@@ -97,7 +154,9 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null);
         clearTokens();
-        window.location.href = "/auth/sign-in";
+        if (typeof window !== "undefined" && window.location.pathname !== "/auth/sign-in") {
+          window.location.href = "/auth/sign-in";
+        }
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -107,22 +166,5 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-/* =========================
-   TOKEN HELPERS
-========================= */
-
-export const setTokens = ({ token, refreshToken }) => {
-  if (token) localStorage.setItem("token", token);
-  if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
-};
-
-export const clearTokens = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("refreshToken");
-};
-
-export const getToken = () => localStorage.getItem("token");
-export const getRefreshToken = () => localStorage.getItem("refreshToken");
 
 export default axiosInstance;

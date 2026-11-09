@@ -3,9 +3,9 @@ import userAPI from "./userAPI";
 
 export const fetchUsers = createAsyncThunk(
   "user/fetchUsers",
-  async ({ page = 0, size = 10, role } = {}, { rejectWithValue }) => {
+  async ({ page = 0, size = 10, roles } = {}, { rejectWithValue }) => {
     try {
-      const res = await userAPI.getUsers({ page, size, role });
+      const res = await userAPI.getUsers({ page, size, roles });
       return res.result || res;
     } catch (e) {
       return rejectWithValue(e.response?.data || e.message);

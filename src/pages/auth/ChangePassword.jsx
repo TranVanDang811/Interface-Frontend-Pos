@@ -194,6 +194,9 @@ console.log(currentUser);
           <Button type="submit" fullWidth disabled={loading}>
             {loading ? "Changing..." : "Change Password"}
           </Button>
+             <Button variant="outlined" onClick={() => navigate(-1)}>
+                          Cancel
+                        </Button>
         </form>
       </div>
     </section>

@@ -55,6 +55,18 @@ export const confirmImportOrder = createAsyncThunk(
   }
 );
 
+// CANCEL
+export const cancelImportOrder = createAsyncThunk(
+  "importOrder/cancel",
+  async (orderId, { rejectWithValue }) => {
+    try {
+      return await importOrderAPI.cancelImportOrder(orderId);
+    } catch (e) {
+      return rejectWithValue(e.response?.data || e.message);
+    }
+  }
+);
+
 // DELETE
 export const deleteImportOrder = createAsyncThunk(
   "importOrder/delete",

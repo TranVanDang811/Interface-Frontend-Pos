@@ -1,3 +1,268 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ==========================================================================
+   GLOBAL THEME STYLES (HỖ TRỢ ĐỒNG BỘ NỀN ĐEN & NỀN TRẮNG)
+   ========================================================================== */
+
+/* MƯỢT MÀ KHI CHUYỂN ĐỔI THEME */
+body,
+aside,
+nav,
+main,
+.min-h-screen,
+input,
+select,
+table,
+th,
+td {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* ==========================================================================
+   1. CHẾ ĐỘ NỀN TỐI (DARK MODE - html.dark)
+   ========================================================================== */
+html.dark {
+  color-scheme: dark;
+}
+
+/* Nền toàn trang & Body */
+html.dark body,
+html.dark .min-h-screen {
+  background-color: #0b0f19 !important;
+  color: #f8fafc !important;
+}
+
+/* Thẻ Card, Panel, Khối nền trắng -> Đổi sang nền đen than chì sang trọng */
+html.dark .bg-white {
+  background-color: #111827 !important;
+  color: #f8fafc !important;
+  border-color: #1f2937 !important;
+}
+
+/* Các vùng phụ màu xám nhạt */
+html.dark .bg-blue-gray-50\/50,
+html.dark .bg-blue-gray-50,
+html.dark .bg-gray-50,
+html.dark .bg-slate-50 {
+  background-color: #161f30 !important;
+}
+
+/* Viền phân cách trong Dark Mode */
+html.dark .border-blue-gray-50,
+html.dark .border-blue-gray-100,
+html.dark .border-slate-100,
+html.dark .border-slate-200,
+html.dark .border-gray-100,
+html.dark .border-gray-200 {
+  border-color: #1f2937 !important;
+}
+
+/* Văn bản tiêu đề & nội dung (tương phản cao, sắc nét) */
+html.dark .text-slate-900,
+html.dark .text-slate-800,
+html.dark .text-gray-900,
+html.dark .text-gray-800,
+html.dark .text-blue-gray-900,
+html.dark .text-blue-gray-800 {
+  color: #f8fafc !important;
+}
+
+html.dark .text-slate-700,
+html.dark .text-gray-700,
+html.dark .text-blue-gray-700 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-slate-600,
+html.dark .text-gray-600,
+html.dark .text-blue-gray-600,
+html.dark .text-gray-500,
+html.dark .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+/* Tinh chỉnh các chữ số KPI màu tối -> sáng nổi bật trên nền đen */
+html.dark .text-emerald-800,
+html.dark .text-emerald-700 {
+  color: #34d399 !important;
+}
+
+html.dark .text-amber-900,
+html.dark .text-amber-800,
+html.dark .text-amber-700 {
+  color: #fbbf24 !important;
+}
+
+html.dark .text-blue-800,
+html.dark .text-blue-700 {
+  color: #60a5fa !important;
+}
+
+html.dark .text-red-800,
+html.dark .text-red-700 {
+  color: #f87171 !important;
+}
+
+/* Ô nhập liệu (Input, Select, Textarea) trong Dark Mode */
+html.dark input:not([type="checkbox"]):not([type="radio"]),
+html.dark select,
+html.dark textarea {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+html.dark input:not([type="checkbox"]):not([type="radio"]):focus,
+html.dark select:focus,
+html.dark textarea:focus {
+  background-color: #0f172a !important;
+  border-color: #3b82f6 !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* Bảng dữ liệu (Table) trong Dark Mode */
+html.dark table thead tr,
+html.dark table thead th {
+  background-color: #1e293b !important;
+  color: #cbd5e1 !important;
+  border-color: #334155 !important;
+}
+
+html.dark table tbody tr {
+  border-color: #1f2937 !important;
+  color: #f8fafc !important;
+}
+
+html.dark table tbody tr:hover {
+  background-color: #1e293b !important;
+}
+
+/* Các hộp icon thống kê (Icon Box) */
+html.dark .bg-blue-50 {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  color: #60a5fa !important;
+}
+
+html.dark .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+}
+
+html.dark .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: #fbbf24 !important;
+}
+
+html.dark .bg-red-50 {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  color: #f87171 !important;
+}
+
+html.dark .bg-indigo-50 {
+  background-color: rgba(99, 102, 241, 0.15) !important;
+  color: #818cf8 !important;
+}
+
+html.dark .bg-purple-50 {
+  background-color: rgba(168, 85, 247, 0.15) !important;
+  color: #c084fc !important;
+}
+
+html.dark .bg-pink-50 {
+  background-color: rgba(236, 72, 153, 0.15) !important;
+  color: #f472b6 !important;
+}
+
+/* Badge trạng thái (Chips / Pills) */
+html.dark .bg-green-100 {
+  background-color: rgba(34, 197, 94, 0.2) !important;
+  color: #4ade80 !important;
+}
+
+html.dark .bg-red-100 {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+  color: #f87171 !important;
+}
+
+html.dark .bg-amber-100 {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  color: #fbbf24 !important;
+}
+
+html.dark .bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+  color: #60a5fa !important;
+}
+
+/* Nút viền (Outlined buttons) */
+html.dark button[class*="border-blue-gray"],
+html.dark button[class*="variant=\"outlined\""],
+html.dark .border-gray-200.bg-gray-50 button {
+  border-color: #374151 !important;
+}
+
+/* Dropdown Menu, Dialog, Popover */
+html.dark [role="menu"],
+html.dark [role="dialog"],
+html.dark .react-calendar,
+html.dark .shadow-lg {
+  background-color: #111827 !important;
+  border-color: #1f2937 !important;
+  color: #f8fafc !important;
+}
+
+html.dark [role="menuitem"]:hover {
+  background-color: #1e293b !important;
+  color: #60a5fa !important;
+}
+
+
+/* ==========================================================================
+   2. CHẾ ĐỘ NỀN SÁNG (LIGHT MODE - html:not(.dark))
+   ========================================================================== */
+html:not(.dark) {
+  color-scheme: light;
+}
+
+html:not(.dark) body,
+html:not(.dark) .min-h-screen {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+}
+
+html:not(.dark) .bg-white {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+
+html:not(.dark) input:not([type="checkbox"]):not([type="radio"]),
+html:not(.dark) select,
+html:not(.dark) textarea {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+  color: #0f172a;
+}
+
+html:not(.dark) input:not([type="checkbox"]):not([type="radio"]):focus,
+html:not(.dark) select:focus,
+html:not(.dark) textarea:focus {
+  background-color: #ffffff;
+  border-color: #3b82f6;
+}
+
+html:not(.dark) table thead tr,
+html:not(.dark) table thead th {
+  background-color: #f8fafc;
+  color: #64748b;
+  border-color: #e2e8f0;
+}
+
+html:not(.dark) table tbody tr:hover {
+  background-color: #f1f5f9;
+}

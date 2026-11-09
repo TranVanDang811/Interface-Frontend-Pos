@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import authAPI from "./authAPI";
 import userAPI from "@/features/user/userAPI";
-import { setTokens, clearTokens } from "@/services/axiosInstance";
+import { setTokens, clearTokens, getToken, getRefreshToken } from "@/services/axiosInstance";
 
 export const login = createAsyncThunk(
   "auth/login",
@@ -14,7 +14,7 @@ export const login = createAsyncThunk(
       const token = authPayload.token || authPayload.accessToken;
       const refreshToken = authPayload.refreshToken;
 
-      // 2. Lưu token vào localStorage và axios instance
+      // 2. Lưu token vào sessionStorage (tab-isolated)
       setTokens({ token, refreshToken });
 
       // 3. Lấy thông tin user
@@ -37,11 +37,10 @@ export const refreshToken = createAsyncThunk(
   "auth/refresh",
   async (_, { rejectWithValue }) => {
     try {
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (!refreshToken) throw new Error("No refresh token");
+      const currentRefreshToken = getRefreshToken();
+      if (!currentRefreshToken) throw new Error("No refresh token");
 
-      const res = await authAPI.refresh({ token: refreshToken }); 
-      // ⚠ backend của anh dùng request.getToken()
+      const res = await authAPI.refresh({ token: currentRefreshToken }); 
 
       const payload = res.result || res;
 
@@ -60,14 +59,16 @@ export const refreshToken = createAsyncThunk(
   }
 );
 
-
 export const logout = createAsyncThunk(
   "auth/logout",
   async (payload, { rejectWithValue }) => {
     try {
-      await authAPI.logout(payload);
+      const token = getToken();
+      const refreshToken = getRefreshToken();
+      if (token || refreshToken) {
+        await authAPI.logout(payload || { token, refreshToken });
+      }
     } catch (e) {
-      // Vẫn clear token dù API fail
       console.error("Logout API error:", e);
     } finally {
       clearTokens();
@@ -75,13 +76,13 @@ export const logout = createAsyncThunk(
   }
 );
 
-// Thunk để khôi phục session từ localStorage
+// Thunk để khôi phục session từ storage (sessionStorage ưu tiên)
 export const restoreSession = createAsyncThunk(
   "auth/restoreSession",
   async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      const refreshToken = localStorage.getItem("refreshToken");
+      const token = getToken();
+      const refreshToken = getRefreshToken();
 
       if (!token) {
         return rejectWithValue("No token found");

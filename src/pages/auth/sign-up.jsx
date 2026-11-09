@@ -11,11 +11,18 @@ import { Link } from "react-router-dom";
 export function SignUp() {
   return (
     <section className="m-8 flex">
-            <div className="w-2/5 h-full hidden lg:block">
-        <img
-          src="/img/pattern.png"
-          className="h-full w-full object-cover rounded-3xl"
-        />
+            <div className="w-2/5 h-full hidden lg:flex flex-col items-center justify-center bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-3xl p-8 text-white shadow-xl min-h-[600px]">
+        <div className="text-center">
+          <div className="w-20 h-20 mx-auto mb-6 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+            <span className="text-4xl">🏪</span>
+          </div>
+          <Typography variant="h3" className="font-bold text-white mb-2">
+            POS System
+          </Typography>
+          <Typography className="text-blue-100 text-sm max-w-xs mx-auto">
+            Giải pháp quản lý bán hàng và quản trị chuỗi cửa hàng hiện đại, hiệu quả.
+          </Typography>
+        </div>
       </div>
       <div className="w-full lg:w-3/5 flex flex-col items-center justify-center">
         <div className="text-center">
@@ -76,7 +83,9 @@ export function SignUp() {
               <span>Sign in With Google</span>
             </Button>
             <Button size="lg" color="white" className="flex items-center gap-2 justify-center shadow-md" fullWidth>
-              <img src="/img/twitter-logo.svg" height={24} width={24} alt="" />
+              <svg className="w-5 h-5 fill-current text-blue-400" viewBox="0 0 24 24">
+                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+              </svg>
               <span>Sign in With Twitter</span>
             </Button>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Input, Button, Typography } from "@material-tailwind/react";
+import { Card, Input, Button, Typography, Select, Option } from "@material-tailwind/react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -10,7 +10,12 @@ export default function OpenShift() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [openingCash, setOpeningCash] = useState("");
+  // default tiền
+  const [openingCash, setOpeningCash] = useState(1765000);
+
+  // chọn option
+  const [shiftOption, setShiftOption] = useState("A");
+
   const [note, setNote] = useState("");
 
   const handleSubmit = async () => {
@@ -24,11 +29,14 @@ export default function OpenShift() {
       return;
     }
 
+    // ✅ gộp option vào note
+    const finalNote = `Ca ${shiftOption}${note ? " - " + note : ""}`;
+
     try {
-      const result = await dispatch(
+      await dispatch(
         openShift({
           openingCash: Number(openingCash),
-          note,
+          note: finalNote,
         })
       ).unwrap();
 
@@ -53,7 +61,7 @@ export default function OpenShift() {
   return (
     <section className="flex items-center justify-center min-h-screen bg-gray-50">
       <Card className="w-full max-w-md p-8 shadow-xl rounded-2xl">
-        {/* Title */}
+        
         <div className="text-center mb-6">
           <Typography variant="h4" className="font-bold">
             Mở ca làm việc
@@ -63,8 +71,20 @@ export default function OpenShift() {
           </Typography>
         </div>
 
-        {/* Form */}
         <div className="flex flex-col gap-5">
+          
+          {/* Option A B C */}
+          <div>
+            <Typography className="mb-2 font-medium">
+              Chọn ca
+            </Typography>
+            <Select value={shiftOption} onChange={(val) => setShiftOption(val)}>
+              <Option value="A">Ca A - Ca sáng</Option>
+              <Option value="B">Ca B - Ca chiều</Option>
+              <Option value="C">Ca C - Ca tối</Option>
+            </Select>
+          </div>
+
           {/* Opening Cash */}
           <div>
             <Typography className="mb-2 font-medium">
@@ -75,23 +95,11 @@ export default function OpenShift() {
               min="0"
               value={openingCash}
               onChange={(e) => setOpeningCash(e.target.value)}
-              placeholder="Nhập số tiền..."
             />
           </div>
 
-          {/* Note */}
-          <div>
-            <Typography className="mb-2 font-medium">
-              Ghi chú (tuỳ chọn)
-            </Typography>
-            <Input
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Ví dụ: Mở ca sáng"
-            />
-          </div>
+  
 
-          {/* Buttons */}
           <Button color="green" onClick={handleSubmit}>
             Mở ca
           </Button>

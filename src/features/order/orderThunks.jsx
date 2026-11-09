@@ -1,12 +1,25 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import orderAPI from "./orderAPI";
 
-// Fetch orders
+// Fetch orders (with filtering and pagination)
 export const fetchOrders = createAsyncThunk(
   "order/fetchOrders",
-  async ({ page = 1, size = 5 } = {}, { rejectWithValue }) => {
+  async (params = { page: 1, size: 10 }, { rejectWithValue }) => {
     try {
-      const res = await orderAPI.getOrders(page, size);
+      const res = await orderAPI.getOrders(params);
+      return res.result || res;
+    } catch (e) {
+      return rejectWithValue(e.response?.data || e.message);
+    }
+  }
+);
+
+// Fetch order summary stats
+export const fetchOrderSummary = createAsyncThunk(
+  "order/fetchOrderSummary",
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const res = await orderAPI.getOrderSummary(params);
       return res.result || res;
     } catch (e) {
       return rejectWithValue(e.response?.data || e.message);
@@ -108,7 +121,7 @@ export const updateOrder = createAsyncThunk(
 // Get orders by status
 export const fetchOrdersByStatus = createAsyncThunk(
   "order/fetchOrdersByStatus",
-  async ({ status, page = 1, size = 5 }, { rejectWithValue }) => {
+  async ({ status, page = 1, size = 10 }, { rejectWithValue }) => {
     try {
       const res = await orderAPI.getOrdersByStatus(status, page, size);
       return res.result || res;

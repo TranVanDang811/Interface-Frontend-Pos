@@ -35,8 +35,8 @@ const shiftSlice = createSlice({
       })
 
       // Current shift
-     .addCase(fetchCurrentShift.fulfilled, (state, action) => {
-  state.currentShift = action.payload.result; 
+.addCase(fetchCurrentShift.fulfilled, (state, action) => {
+  state.currentShift = action.payload;
 })
 
       // Report

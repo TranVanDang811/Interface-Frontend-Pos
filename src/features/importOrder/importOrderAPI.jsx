@@ -29,6 +29,11 @@ const importOrderAPI = {
     axiosInstance.put(`${BASE_URL}/${orderId}/confirm-finalize`)
       .then(res => res.data.result),
 
+  // CANCEL
+  cancelImportOrder: (orderId) =>
+    axiosInstance.put(`${BASE_URL}/${orderId}/cancel`)
+      .then(res => res.data.result),
+
   // DELETE
   deleteImportOrder: (orderId) =>
     axiosInstance.delete(`${BASE_URL}/${orderId}`),

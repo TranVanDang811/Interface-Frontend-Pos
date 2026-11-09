@@ -3,6 +3,7 @@ import {
   fetchImportOrders,
   createImportOrder,
   confirmImportOrder,
+  cancelImportOrder,
   deleteImportOrder,
   fetchImportStatistics,
   fetchImportOrderDetails,
@@ -66,22 +67,32 @@ const importOrderSlice = createSlice({
       // CONFIRM
       // ================================
       .addCase(confirmImportOrder.fulfilled, (state, action) => {
-          const updatedOrder = action.payload;
+        const updatedOrder = action.payload;
+        const index = state.list.findIndex((o) => o.id === updatedOrder.id);
+        if (index !== -1) {
+          state.list[index] = updatedOrder;
+        }
+        state.confirmedMap[updatedOrder.id] = true;
+      })
 
-          const index = state.list.findIndex(o => o.id === updatedOrder.id);
-          if (index !== -1) {
-            state.list[index] = updatedOrder;
-          }
+      // ================================
+      // CANCEL
+      // ================================
+      .addCase(cancelImportOrder.fulfilled, (state, action) => {
+        const updatedOrder = action.payload;
+        const index = state.list.findIndex((o) => o.id === updatedOrder.id);
+        if (index !== -1) {
+          state.list[index] = updatedOrder;
+        }
+      })
 
-          state.confirmedMap[updatedOrder.id] = true;
-        })
       // ================================
       // DELETE
       // ================================
-    .addCase(deleteImportOrder.fulfilled, (state, action) => {
-  state.list = state.list.filter(o => o.id !== action.payload);
-  delete state.details[action.payload];
-})
+      .addCase(deleteImportOrder.fulfilled, (state, action) => {
+        state.list = state.list.filter((o) => o.id !== action.payload);
+        delete state.details[action.payload];
+      })
 
       // ================================
       // STATISTICS
@@ -99,7 +110,6 @@ const importOrderSlice = createSlice({
       })
       .addCase(fetchImportOrderDetails.fulfilled, (state, action) => {
         const { orderId, data } = action.payload;
-
         state.detailLoading[orderId] = false;
         state.details[orderId] = data;
       })
@@ -111,18 +121,26 @@ const importOrderSlice = createSlice({
       // ================================
       // UPDATE RECEIVED QUANTITY
       // ================================
-     .addCase(updateReceivedQuantity.fulfilled, (state, action) => {
+      .addCase(updateReceivedQuantity.fulfilled, (state, action) => {
+        const updatedOrder = action.payload;
+        const { orderId, detailId, receivedQuantity } = action.meta.arg;
 
-  const updatedOrder = action.payload;
+        const index = state.list.findIndex((o) => o.id === updatedOrder.id);
+        if (index !== -1) {
+          state.list[index] = updatedOrder;
+        }
 
-  const index = state.list.findIndex(o => o.id === updatedOrder.id);
-
-  if (index !== -1) {
-    state.list[index] = updatedOrder;
-  }
-
-  delete state.details[updatedOrder.id];
-});
+        const cachedDetail = state.details[orderId];
+        if (cachedDetail) {
+          const itemIndex = cachedDetail.content.findIndex((d) => d.id === detailId);
+          if (itemIndex !== -1) {
+            cachedDetail.content[itemIndex] = {
+              ...cachedDetail.content[itemIndex],
+              receivedQuantity,
+            };
+          }
+        }
+      });
   },
 });
 

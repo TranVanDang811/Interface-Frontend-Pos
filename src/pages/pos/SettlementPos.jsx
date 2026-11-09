@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Card, Input, Button, Typography } from "@material-tailwind/react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { closeShift } from "@/features/shift/shiftThunks";
+import { closeShift, exportShiftReport } from "@/features/shift/shiftThunks";
 import { showAlert } from "@/features/alert/alertSlice";
 import { logout } from "@/features/auth/authThunks";
 
@@ -21,7 +21,19 @@ const denominations = [
 export default function SettlementPos() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+const [modal, setModal] = useState({
+  open: false,
+  htmlContent: "",
+});
+const ThermalReceipt = ({ html }) => {
+  if (!html) return null;
+  return (
+    <div
+      className="w-[260px] text-[11px] font-mono bg-white mx-auto"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
+};
   const [cash, setCash] = useState({
     note500k: 0,
     note200k: 0,
@@ -50,36 +62,92 @@ export default function SettlementPos() {
   };
 
   // 👉 Submit close shift
-  const handleSubmit = async () => {
-    try {
-      await dispatch(
-        closeShift({
-          ...cash,
-          totalCash: totalAmount,
-        })
-      ).unwrap();
+const handleSubmit = async () => {
+  try {
+    const res = await dispatch(
+      closeShift({
+        ...cash,
+        totalCash: totalAmount,
+      })
+    ).unwrap();
 
-      dispatch(
-        showAlert({
-          type: "green",
-          message: "Đóng ca thành công",
-        })
-      );
-
-        
-    await dispatch(logout()).unwrap();
-
-    navigate("/login");
-    } catch (err) {
-      dispatch(
-        showAlert({
-          type: "red",
-          message: err || "Đóng ca thất bại",
-        })
-      );
+    // 👉 Nếu không có shiftCode -> coi như lỗi logic
+    if (!res || !res.shiftCode) {
+      throw new Error("Không có ca đang mở");
     }
-  };
 
+    dispatch(
+      showAlert({
+        type: "green",
+        message: "Đóng ca thành công",
+      })
+    );
+
+    const shiftCode = res.shiftCode;
+
+    // 👉 export chỉ khi closeShift OK
+    const html = await dispatch(exportShiftReport(shiftCode)).unwrap();
+
+    setModal({
+      open: true,
+      htmlContent: html,
+    });
+
+  } catch (err) {
+    console.error("Close shift error:", err);
+
+    // 👉 Handle nhiều kiểu lỗi backend
+    let message = "Đóng ca thất bại";
+
+    if (typeof err === "string") {
+      message = err;
+    } else if (err?.message) {
+      message = err.message;
+    } else if (err?.response?.data?.message) {
+      message = err.response.data.message;
+    }
+
+    // 👉 custom lỗi không có ca
+    if (message.toLowerCase().includes("shift") || message.includes("ca")) {
+      message = "Hiện tại không có ca đang mở";
+    }
+
+    dispatch(
+      showAlert({
+        type: "red",
+        message,
+      })
+    );
+  }
+};
+useEffect(() => {
+  if (modal.open) {
+    document.body.style.overflow = "hidden";
+    document.body.style.width = "100%";
+  } else {
+    document.body.style.overflow = "";
+    document.body.style.width = "";
+  }
+  return () => {
+    document.body.style.overflow = "";
+    document.body.style.width = "";
+  };
+}, [modal.open]);
+window.onerror = function (message, source, lineno, colno, error) {
+  console.error("Global error:", error);
+};
+const handlePrint = () => {
+  const w = window.open("", "", "width=300,height=600");
+  w.document.write(`<body style="font-family:monospace">${modal.htmlContent}</body>`);
+  w.document.close();
+  w.print();
+  w.close();
+};
+const handleCloseModal = async () => {
+  setModal({ open: false, htmlContent: "" });
+  await dispatch(logout());
+  navigate("/login");
+};
   return (
     <div className="p-6 flex justify-center">
       <Card className="w-full max-w-3xl p-6 shadow-xl rounded-2xl">
@@ -120,7 +188,7 @@ export default function SettlementPos() {
         <div className="mt-6 flex justify-between">
           <Button
             color="gray"
-            onClick={() => navigate(-1)}
+             onClick={() => navigate(-1)}
           >
             Quay lại
           </Button>
@@ -133,6 +201,44 @@ export default function SettlementPos() {
           </Button>
         </div>
       </Card>
+      {modal.open && (
+  <div
+    onClick={() => setModal({ open: false, htmlContent: "" })}
+    className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="bg-white rounded-xl w-[420px] max-h-[90vh] flex flex-col overflow-hidden"
+    >
+      {/* HEADER */}
+      <div className="p-4 border-b">
+        <div className="font-semibold">Shift Report</div>
+      </div>
+
+      {/* BODY */}
+      <div className="p-5 overflow-y-auto text-center">
+        <ThermalReceipt html={modal.htmlContent} />
+      </div>
+
+      {/* FOOTER */}
+      <div className="flex justify-end gap-2 p-4 border-t">
+        <button
+          onClick={handleCloseModal}
+          className="px-4 py-2 border rounded-lg text-sm"
+        >
+          Đóng
+        </button>
+
+        <button
+          onClick={handlePrint}
+          className="bg-black text-white px-4 py-2 rounded-lg text-sm"
+        >
+          🖨 In
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

@@ -39,3 +39,15 @@ export const fetchDashboardReport = createAsyncThunk(
     }
   }
 );
+
+export const fetchProductReport = createAsyncThunk(
+  "report/products",
+  async (params, { rejectWithValue }) => {
+    try {
+      const res = await reportAPI.getProductReport(params);
+      return res.result || res;
+    } catch (e) {
+      return rejectWithValue(e.response?.data || e.message);
+    }
+  }
+);
