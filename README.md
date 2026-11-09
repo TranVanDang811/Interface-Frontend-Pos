@@ -1,4 +1,3 @@
-<img width="1915" height="962" alt="Screenshot 2026-11-09 202247" src="https://github.com/user-attachments/assets/29d1474d-072d-4f76-85ad-36c5385d6212" />
 # 🛒 POS System – Retail & Cashier Web Application
 
 [![React](https://img.shields.io/badge/React-18.2.0-61DAFB?logo=react&logoColor=black)](https://react.dev/)
